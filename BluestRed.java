@@ -18,10 +18,10 @@ public class BluestRed implements KeyListener{
 		for(int i = 0; i <= 1200; i+= 50){
 			for(int j = 0; j < Math.random()*1+1; j++) Block.generate(i);	
 		}
-		Player.player1 = new Player(75,50,"P1");
-		Player.player2 = new Player(1125,50,"P2");
-		Player.player1.color = Color.red;
-		Player.player2.color = Color.blue;
+		Player.player1 = new Player(200,50,"P1");
+		Player.player2 = new Player(900,50,"P2");
+		Player.player1.color = Color.blue;
+		Player.player2.color = Color.red;
 	}
 
 	public static void update(){
@@ -40,6 +40,8 @@ public class BluestRed implements KeyListener{
 	}
 
 	public static class Canvas extends JPanel{
+		static boolean start = true;
+		static int count = 3;
 		public void paintComponent(Graphics g2){
 			Graphics2D g = (Graphics2D) g2;
 				g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
@@ -56,6 +58,7 @@ public class BluestRed implements KeyListener{
 			g.setColor(Player.player2.color);
 			g.fillOval((int)(Player.player2.x-Player.player2.size),(int)(Player.player2.y-Player.player2.size),Player.player2.size*2,Player.player2.size*2);
 			g.drawString(Player.player2.name,(int)Player.player2.x+Player.player2.size*2,(int)Player.player2.y+Player.player2.size*2);
+			if(start) starter(g,count);
 		}
 	}
 
@@ -63,11 +66,17 @@ public class BluestRed implements KeyListener{
 		public void paintComponent(Graphics g2){
 			Graphics2D g = (Graphics2D) g2;
 				g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
+				g.setFont(new Font("Arial", Font.BOLD, 50)); 
 			g.setColor(Color.DARK_GRAY);
 			g.fillRect(0,0,frame.getWidth(),frame.getHeight());
-			g.setColor(Color.white);
-			if(Player.player1.lost) g.drawString("P2 WON!",500,500);		
-			else if(Player.player2.lost) g.drawString("P1 WON!",500,500);		
+			if(Player.player1.lost){
+				g.setColor(Color.red);
+				g.drawString("P2 WON",460,450);	
+			}	
+			else{
+				g.setColor(Color.blue);
+				g.drawString("P1 WON",460,450);		
+			}
 		}
 	}
 
@@ -87,22 +96,35 @@ public class BluestRed implements KeyListener{
 			g.drawString("#6. Press r to insert coin and begin the game!",200,700);
 		}
 	}
-		
+
+	public static void starter(Graphics g, int count){
+		g.setColor(Color.white);
+		g.setFont(new Font("Arial", Font.BOLD, 100)); 
+		g.drawString(count+"",525,450);
+		Canvas.count--;
+	}
+	
 	public static void main(String[] args){
 		init();
 		while(true){
+			Canvas.start = true;
 			frame.add(new Menu());
 			frame.setVisible(true);
 			while(!run){
 				try{Thread.sleep(2);}catch(Exception e){}
 			}
+			for(int i = 0; i <= 3; i++){
+				update();
+				try{Thread.sleep(500);}catch(Exception e){}
+			}
 			while(true){
 				update();
+				Canvas.start = false;
 				Player.lost();
 				if(Player.player1.lost || Player.player2.lost){
 					frame.add(new Lost());
 					frame.setVisible(true);
-					try{Thread.sleep(3000);}catch(Exception e){}
+					try{Thread.sleep(1000);}catch(Exception e){}
 					Block.all = new ArrayList<Block>();
 					Block.fallen = new ArrayList<Block>();
 					for(int i = 0; i <= 1200; i+= 50){
@@ -112,6 +134,7 @@ public class BluestRed implements KeyListener{
 					Player.player2 = new Player(1125,50,"P2");
 					Player.player1.color = Color.red;
 					Player.player2.color = Color.blue;
+					Canvas.count = 3;
 					run = false;
 					break;
 				}
