@@ -1,2 +1,2 @@
 # BottleFlip
-RUI LI CUNT
+flip them bottles
